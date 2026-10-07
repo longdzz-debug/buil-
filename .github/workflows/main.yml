@@ -1,0 +1,44 @@
+name: Build 3105
+
+on: 
+workflow_dispatch:
+
+jobs: 
+build: 
+runs-on: macos-latest
+
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Giải nén source
+    run: |
+      unzip Full source 3105 OG.zip
+      ls -la
+      ls -la Full source 3105 OG/
+
+  - name: Build Release
+    run: |
+      cd Full source 3105 OG
+      xcodebuild -project ThreeOneOSFive.xcodeproj \
+                 -scheme 3105 \
+                 -configuration Release \
+                 -sdk iphoneos \
+                 CODE_SIGN_IDENTITY="" \
+                 CODE_SIGNING_REQUIRED=NO \
+                 CODE_SIGNING_ALLOWED=NO \
+                 clean archive \
+                 -archivePath build/3105.xcarchive
+
+  - name: Tạo IPA từ .xcarchive
+    run: |
+      cd Full source 3105 OG
+      mkdir -p Payload
+      cp -R build/3105.xcarchive/Products/Applications/3105.app Payload/
+      zip -r build/3105.ipa Payload/
+
+  - name: Upload IPA
+    uses: actions/upload-artifact@v4
+    with:
+      name: 3105.ipa
+      path: Full source 3105 OG/build/*.ipa
